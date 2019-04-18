@@ -1,0 +1,24 @@
+path: /banks/routing/{routingNumber}
+method: get
+description: Fetch a Bank record by routing number.
+parameters:
+  - in: path
+    name: routingNumber
+    required: true
+    type: string
+responses:
+  '200':
+    description: Success
+    schema:
+      type: object
+      properties:
+        id:
+          type: number
+        name:
+          type: string
+        routingNumber:
+          type: string
+      required:
+        - id
+        - name
+        - routingNumber

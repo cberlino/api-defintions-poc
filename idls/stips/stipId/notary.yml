@@ -1,0 +1,73 @@
+path: /stips/{stipId}/notary
+method: post
+description: Create initial notary request and send to vendor.
+parameters:
+  - in: path
+    name: stipId
+    required: true
+    type: string
+  - in: body
+    name: body
+    schema:
+      type: object
+      properties:
+        address:
+          description: Notary address
+          type: object
+          properties:
+            city:
+              description: city
+              type: string
+            country:
+              description: country
+              type: string
+              pattern: '^[A-Z]{2}$'
+            county:
+              description: county
+              type: string
+            stateId:
+              description: stateId
+              type: number
+            street1:
+              description: street1
+              type: string
+            zip:
+              description: zip
+              type: string
+              pattern: '^\d{5}$'
+          required:
+            - city
+            - country
+            - county
+            - stateId
+            - street1
+            - zip
+        appointmentAt:
+          description: appointment date
+          type: string
+        borrowerNotes:
+          description: borrowerNotes
+          type: string
+        notes:
+          description: notes
+          type: string
+      required:
+        - address
+        - appointmentAt
+responses:
+  200:
+    description: Success
+    schema:
+      type: object
+      properties:
+        appointmentAt:
+          description: appointment date
+          type: string
+        borrowerNotes:
+          description: borrowerNotes
+          type: string
+        notes:
+          description: notes
+          type: string
+      required:
+        - appointmentAt

@@ -1,0 +1,31 @@
+path: /agent-tool/quotes/{quoteId}/compensate/simulate
+method: post
+description: Endpoint to compensate all interested parties in a vehicle. Chained to include boarding a loan and sending notifications.
+parameters:
+  - in: query
+    name: credit_offer_id
+    required: true
+    type: string
+
+  - in: query
+    name: credit_offer_ids
+    required: true
+    type: string
+
+  - in: path
+    name: quoteId
+    required: true
+    type: string
+responses:
+  '200':
+    description: Success
+    schema:
+      type: object
+      properties:
+        transactionIds:
+          description: Credit card checkout transaction Id numbers for each order
+          type: array
+          items:
+            type: number
+      required:
+        - transactionIds

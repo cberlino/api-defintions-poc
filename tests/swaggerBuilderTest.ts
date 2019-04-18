@@ -1,0 +1,173 @@
+import { SwaggerBuilder } from "../src/swaggerBuilder";
+import * as chai from 'chai';
+import * as chaiAsPromised from 'chai-as-promised';
+
+const expect = chai.expect;
+chai.use(chaiAsPromised);
+
+describe('SwaggerBuilder', () => {
+  it('should throw an error because no .yml file was found. ', async () => {
+    const filePath = 'Files/DoesntExist.yml';
+    expect(new SwaggerBuilder(filePath).execute()).to.be.rejectedWith('There were no api definition files found.');
+  });
+
+  it('should match the test schema', async () => {
+    const generatedSchema = await new SwaggerBuilder('tests/testData/idls/**/*.yml').execute();
+    const testGeneratedSchema = `swagger: '2.0'
+info:
+  title: Oportun Auto API
+  description: The API used for interacting with Oportun Auto.
+  version: 4.0.0
+host: api-sandbox.platform.springboardauto.com
+consumes:
+  - application/json
+produces:
+  - application/json
+basePath: /api/v1
+schemes:
+  - https
+paths:
+  '/agent-tool/quotes/{quoteId}/compensate/simulate':
+    post:
+      summary: >-
+        Endpoint to compensate all interested parties in a vehicle. Chained to
+        include boarding a loan and sending notifications.
+      tags:
+        - testData/idls/agent-tool/quotes/quoteId/compensate
+      description: >-
+        Endpoint to compensate all interested parties in a vehicle. Chained to
+        include boarding a loan and sending notifications.
+      parameters:
+        - in: query
+          name: credit_offer_id
+          required: true
+          type: string
+        - in: query
+          name: credit_offer_ids
+          required: true
+          type: string
+        - in: path
+          name: quoteId
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Success
+          schema:
+            type: object
+            properties:
+              transactionIds:
+                description: Credit card checkout transaction Id numbers for each order
+                type: array
+                items:
+                  type: number
+            required:
+              - transactionIds
+  '/banks/routing/{routingNumber}':
+    get:
+      summary: Fetch a Bank record by routing number.
+      tags:
+        - testData/idls/banks/routing
+      description: Fetch a Bank record by routing number.
+      parameters:
+        - in: path
+          name: routingNumber
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Success
+          schema:
+            type: object
+            properties:
+              id:
+                type: number
+              name:
+                type: string
+              routingNumber:
+                type: string
+            required:
+              - id
+              - name
+              - routingNumber
+  '/stips/{stipId}/notary':
+    post:
+      summary: Create initial notary request and send to vendor.
+      tags:
+        - testData/idls/stips/stipId
+      description: Create initial notary request and send to vendor.
+      parameters:
+        - in: path
+          name: stipId
+          required: true
+          type: string
+        - in: body
+          name: body
+          schema:
+            type: object
+            properties:
+              address:
+                description: Notary address
+                type: object
+                properties:
+                  city:
+                    description: city
+                    type: string
+                  country:
+                    description: country
+                    type: string
+                    pattern: '^[A-Z]{2}$'
+                  county:
+                    description: county
+                    type: string
+                  stateId:
+                    description: stateId
+                    type: number
+                  street1:
+                    description: street1
+                    type: string
+                  zip:
+                    description: zip
+                    type: string
+                    pattern: '^\\d{5}$'
+                required:
+                  - city
+                  - country
+                  - county
+                  - stateId
+                  - street1
+                  - zip
+              appointmentAt:
+                description: appointment date
+                type: string
+              borrowerNotes:
+                description: borrowerNotes
+                type: string
+              notes:
+                description: notes
+                type: string
+            required:
+              - address
+              - appointmentAt
+      responses:
+        '200':
+          description: Success
+          schema:
+            type: object
+            properties:
+              appointmentAt:
+                description: appointment date
+                type: string
+              borrowerNotes:
+                description: borrowerNotes
+                type: string
+              notes:
+                description: notes
+                type: string
+            required:
+              - appointmentAt
+`;
+
+    expect(generatedSchema).to.equal(testGeneratedSchema);
+  });
+});
